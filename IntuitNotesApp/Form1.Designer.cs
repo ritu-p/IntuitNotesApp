@@ -34,6 +34,9 @@
             this.editToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.helpToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.splitContainerNotes = new System.Windows.Forms.SplitContainer();
+            this.dvNotes = new System.Windows.Forms.DataGridView();
+            this.Title = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.ID = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.toolStrip1 = new System.Windows.Forms.ToolStrip();
             this.Add = new System.Windows.Forms.ToolStripButton();
             this.Save = new System.Windows.Forms.ToolStripButton();
@@ -41,15 +44,13 @@
             this.lblTitle = new System.Windows.Forms.Label();
             this.txtTitle = new System.Windows.Forms.TextBox();
             this.NotesBody = new System.Windows.Forms.RichTextBox();
-            this.dvNotes = new System.Windows.Forms.DataGridView();
-            this.Title = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.menuStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainerNotes)).BeginInit();
             this.splitContainerNotes.Panel1.SuspendLayout();
             this.splitContainerNotes.Panel2.SuspendLayout();
             this.splitContainerNotes.SuspendLayout();
-            this.toolStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dvNotes)).BeginInit();
+            this.toolStrip1.SuspendLayout();
             this.SuspendLayout();
             // 
             // menuStrip1
@@ -101,6 +102,43 @@
             this.splitContainerNotes.Size = new System.Drawing.Size(885, 585);
             this.splitContainerNotes.SplitterDistance = 295;
             this.splitContainerNotes.TabIndex = 1;
+            // 
+            // dvNotes
+            // 
+            this.dvNotes.AllowUserToAddRows = false;
+            this.dvNotes.AllowUserToDeleteRows = false;
+            this.dvNotes.AllowUserToResizeColumns = false;
+            this.dvNotes.AllowUserToResizeRows = false;
+            this.dvNotes.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this.dvNotes.ColumnHeadersVisible = false;
+            this.dvNotes.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
+            this.Title,
+            this.ID});
+            this.dvNotes.Location = new System.Drawing.Point(3, 66);
+            this.dvNotes.Name = "dvNotes";
+            this.dvNotes.ReadOnly = true;
+            this.dvNotes.RowHeadersVisible = false;
+            this.dvNotes.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
+            this.dvNotes.Size = new System.Drawing.Size(240, 150);
+            this.dvNotes.TabIndex = 1;
+            this.dvNotes.RowLeave += new System.Windows.Forms.DataGridViewCellEventHandler(this.dvNotes_RowLeave);
+            this.dvNotes.SelectionChanged += new System.EventHandler(this.dvNotes_SelectionChanged);
+            // 
+            // Title
+            // 
+            this.Title.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
+            this.Title.DataPropertyName = "Title";
+            this.Title.HeaderText = "Title";
+            this.Title.Name = "Title";
+            this.Title.ReadOnly = true;
+            // 
+            // ID
+            // 
+            this.ID.DataPropertyName = "NoteGuid";
+            this.ID.HeaderText = "id";
+            this.ID.Name = "ID";
+            this.ID.ReadOnly = true;
+            this.ID.Visible = false;
             // 
             // toolStrip1
             // 
@@ -156,6 +194,7 @@
             this.txtTitle.Size = new System.Drawing.Size(402, 20);
             this.txtTitle.TabIndex = 1;
             this.txtTitle.Tag = "Title";
+            this.txtTitle.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.txtTitle_KeyPress);
             // 
             // NotesBody
             // 
@@ -164,31 +203,7 @@
             this.NotesBody.Size = new System.Drawing.Size(580, 541);
             this.NotesBody.TabIndex = 0;
             this.NotesBody.Text = "";
-            // 
-            // dvNotes
-            // 
-            this.dvNotes.AllowUserToAddRows = false;
-            this.dvNotes.AllowUserToDeleteRows = false;
-            this.dvNotes.AllowUserToResizeColumns = false;
-            this.dvNotes.AllowUserToResizeRows = false;
-            this.dvNotes.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.dvNotes.ColumnHeadersVisible = false;
-            this.dvNotes.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
-            this.Title});
-            this.dvNotes.Location = new System.Drawing.Point(3, 66);
-            this.dvNotes.Name = "dvNotes";
-            this.dvNotes.ReadOnly = true;
-            this.dvNotes.RowHeadersVisible = false;
-            this.dvNotes.Size = new System.Drawing.Size(240, 150);
-            this.dvNotes.TabIndex = 1;
-            // 
-            // Title
-            // 
-            this.Title.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
-            this.Title.DataPropertyName = "Title";
-            this.Title.HeaderText = "Title";
-            this.Title.Name = "Title";
-            this.Title.ReadOnly = true;
+            this.NotesBody.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.NotesBody_KeyPress);
             // 
             // IntuitNotes
             // 
@@ -208,9 +223,9 @@
             this.splitContainerNotes.Panel2.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainerNotes)).EndInit();
             this.splitContainerNotes.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.dvNotes)).EndInit();
             this.toolStrip1.ResumeLayout(false);
             this.toolStrip1.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.dvNotes)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -232,6 +247,7 @@
         private System.Windows.Forms.Label lblTitle;
         private System.Windows.Forms.DataGridView dvNotes;
         private System.Windows.Forms.DataGridViewTextBoxColumn Title;
+        private System.Windows.Forms.DataGridViewTextBoxColumn ID;
     }
 }
 
