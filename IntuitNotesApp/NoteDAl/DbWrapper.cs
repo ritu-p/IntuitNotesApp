@@ -21,17 +21,34 @@ namespace IntuitNotesApp.NoteDAl
             // open the connection:
             sqlite_conn.Open();
 
+            CreateNoteSchema();
+            CreateSyncTimeStampStore();
+
+        }
+
+        private static void CreateNoteSchema()
+        {
             using (
                 SQLiteCommand mCmd =
                     new SQLiteCommand(
-                        "CREATE TABLE IF NOT EXISTS [Notes] ('notes_id' TEXT ,'title' TEXT, 'body' TEXT,'is_server_synced' BOOL,'modified_dt' DATETIME DEFAULT current_timestamp);",
+                        "CREATE TABLE IF NOT EXISTS [Notes] ('notes_id' TEXT ,'title' TEXT, 'body' TEXT,'is_deleted' INTEGER DEFAULT 0,'modified_dt' DATETIME DEFAULT current_timestamp);",
                         sqlite_conn))
             {
                 mCmd.ExecuteNonQuery();
             }
-
         }
 
+        private static void CreateSyncTimeStampStore()
+        {
+            using (
+                SQLiteCommand mCmd =
+                    new SQLiteCommand(
+                        "CREATE TABLE IF NOT EXISTS [SyncTimeStamp] (last_synctimestamp DATETIME );",
+                        sqlite_conn))
+            {
+                mCmd.ExecuteNonQuery();
+            }
+        }
         public static void UpsertNotes(Notes note)
         {
             try
@@ -46,13 +63,13 @@ namespace IntuitNotesApp.NoteDAl
                 if (updated != 1)
                 {
                     com.CommandText =
-                        "INSERT INTO [Notes] ('notes_id'  ,'title', 'body' ,'is_server_synced' ,'modified_dt') Values (@notes_id,@title,@body,@is_server_synced,@modified_date)";
+                        "INSERT INTO [Notes] ('notes_id'  ,'title', 'body' ) Values (@notes_id,@title,@body)";
                     // Add another entry into our database 
                     com.Parameters.AddWithValue("@notes_id", note.NoteGuid);
                     com.Parameters.AddWithValue("@title", note.Title);
                     com.Parameters.AddWithValue("@body", note.Body);
-                    com.Parameters.AddWithValue("@is_server_synced", note.IsCloudSynced);
-                    com.Parameters.AddWithValue("@modified_date", DateTime.Now.ToUniversalTime());
+
+               //     com.Parameters.AddWithValue("@modified_date", DateTime.Now.ToUniversalTime());
                     com.ExecuteNonQuery(); // Execute the query
                 }
             }
@@ -62,13 +79,13 @@ namespace IntuitNotesApp.NoteDAl
             }
         }
 
-        public static Dictionary<string,Notes> GetNotes()
+        public static Dictionary<string,Notes> GetNotesForDisplay()
         {
             Dictionary<string, Notes> dicNotes = new Dictionary<string, Notes>();
             using (SQLiteCommand fmd = sqlite_conn.CreateCommand())
             {
                 fmd.CommandText =
-                    @"SELECT  notes_id  ,title, body ,is_server_synced ,modified_dt FROM [Notes]";
+                    @"SELECT  notes_id  ,title, body ,modified_dt FROM [Notes] where is_deleted=0";
                 fmd.CommandType = CommandType.Text;
                 SQLiteDataReader dataReader = fmd.ExecuteReader();
                        while (dataReader.Read())
@@ -77,9 +94,7 @@ namespace IntuitNotesApp.NoteDAl
                            note.NoteGuid = dataReader["notes_id"] is DBNull ? String.Empty : dataReader["notes_id"].ToString();
                 note.Title = dataReader["title"] is DBNull ? null : dataReader["title"].ToString();
                 note.Body = new StringBuilder(dataReader["body"] is DBNull ? null : dataReader["body"].ToString());
-                note.IsCloudSynced = dataReader["is_server_synced"] is DBNull
-                    ? false
-                    : bool.Parse(dataReader["is_server_synced"].ToString());
+
                 note.ModifiedDate = dataReader["modified_dt"] is DBNull
                     ? DateTime.Now
                     : DateTime.Parse(dataReader["modified_dt"].ToString());
@@ -88,5 +103,61 @@ namespace IntuitNotesApp.NoteDAl
             }
             return dicNotes;
         }
-    }
+
+        public static List<Notes> GetNotesForSync()
+        {
+            List<Notes> lstNotes= new List<Notes>();
+            using (SQLiteCommand fmd = sqlite_conn.CreateCommand())
+            {
+                fmd.CommandText =
+                    @"SELECT  notes_id  ,title, body ,modified_dt FROM [Notes]";
+                fmd.CommandType = CommandType.Text;
+                SQLiteDataReader dataReader = fmd.ExecuteReader();
+                while (dataReader.Read())
+                {
+                    Notes note = new Notes();
+                    note.NoteGuid = dataReader["notes_id"] is DBNull ? String.Empty : dataReader["notes_id"].ToString();
+                    note.Title = dataReader["title"] is DBNull ? null : dataReader["title"].ToString();
+                    note.Body = new StringBuilder(dataReader["body"] is DBNull ? null : dataReader["body"].ToString());
+
+                    note.ModifiedDate = dataReader["modified_dt"] is DBNull
+                        ? DateTime.Now
+                        : DateTime.Parse(dataReader["modified_dt"].ToString());
+                    lstNotes.Add( note);
+                }
+            }
+            return lstNotes;
+        }
+        public static DateTime GetLastSyncTimestamp()
+        {
+            using (SQLiteCommand fmd = sqlite_conn.CreateCommand())
+            {
+                fmd.CommandText =
+                    @"SELECT  last_synctimestamp from  [SyncTimeStamp] ";
+                fmd.CommandType = CommandType.Text;
+                SQLiteDataReader dataReader = fmd.ExecuteReader();
+                while (dataReader.Read())
+                {
+
+                  return dataReader.GetDateTime(0);
+
+                }
+            }
+        }
+         public static void UpdateSyncTimeStamp()
+        {
+            try
+            {
+
+
+                SQLiteCommand com = new SQLiteCommand(sqlite_conn);
+                com.CommandText = "Update [SyncTimeStamp] set last_synctimestamp=DATETIME('NOW') ";
+                // Add the first entry into our database 
+                int updated = com.ExecuteNonQuery(); // Execute the query
+            }
+            catch (Exception ex)
+            {
+                
+            }
+        }
 }

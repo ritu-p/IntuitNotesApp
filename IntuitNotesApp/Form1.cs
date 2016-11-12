@@ -65,7 +65,7 @@ namespace IntuitNotesApp
         {
             DbWrapper.Connect();
 
-            dicNotes = DbWrapper.GetNotes();
+            dicNotes = DbWrapper.GetNotesForDisplay();
             var NotesList = new BindingList<Notes>(dicNotes.Values.ToList());
             dvNotes.DataSource = NotesList;
             dvNotes.Refresh();
