@@ -28,7 +28,7 @@ namespace IntuitNotesBL.NoteDAl
             if ((noteToSync != null))
             {
                 var json = JsonConvert.SerializeObject(noteStore);
-                var url = new Uri("http://localhost:72/api/Sync/SyncData");
+                var url = new Uri("http://localhost:9090/api/Sync/SyncData");
                 var result = await HttpClientUtil.PostHttpAsync(url, json).ConfigureAwait(false);
                 if (result.Status == HttpStatusCode.OK)
                 {

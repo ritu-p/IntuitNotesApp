@@ -16,6 +16,7 @@ namespace IntuitNotesApp
            
 
             var config = new HttpSelfHostConfiguration("http://localhost:9090");
+            IntuitCloudService.WebAPIConfigcs.Register(config);
 
             config.Routes.MapHttpRoute(
                 "API Default", "api/{controller}/{action}",

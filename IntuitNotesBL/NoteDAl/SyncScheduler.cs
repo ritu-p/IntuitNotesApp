@@ -28,6 +28,7 @@ namespace IntuitNotesBL.NoteDAl
         private static void objTimer_Elapsed(object sender, ElapsedEventArgs e)
         {
             if (!worker.IsBusy)
+                
                 worker.RunWorkerAsync();
         }
 
