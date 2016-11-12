@@ -8,6 +8,7 @@ namespace IntuitNotesApp.NoteDAl
     {
         private static BackgroundWorker worker;
         private static readonly Timer objTimer = new Timer();
+        private static readonly string clientId = DbWrapper.GetClientId();
 
         public static void StartSyncTimer()
         {
@@ -15,7 +16,7 @@ namespace IntuitNotesApp.NoteDAl
             worker.DoWork += worker_DoWork;
 
 
-            var iTimerInterval = Convert.ToInt32(10000);
+            var iTimerInterval = Convert.ToInt32(10000); //TODO:configurable
             objTimer.Interval = iTimerInterval;
             objTimer.Elapsed += objTimer_Elapsed;
             objTimer.Start();
@@ -29,7 +30,7 @@ namespace IntuitNotesApp.NoteDAl
 
         private static void worker_DoWork(object sender, DoWorkEventArgs e)
         {
-            //whatever You want the background thread to do...
+            NotesSync.Sync(clientId);
         }
     }
 }

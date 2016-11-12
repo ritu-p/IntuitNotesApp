@@ -1,11 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Data;
-using System.Drawing;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 using IntuitNotesApp.NoteDAl;
 using IntuitNotesApp.NotesModel;
@@ -14,10 +10,11 @@ namespace IntuitNotesApp
 {
     public partial class IntuitNotes : Form
     {
-        private Dictionary<string, Notes> dicNotes;
-        BindingSource srcNotes= new BindingSource();
         public static string selectedNote = "";
-        public bool isEdited = false;
+        private Dictionary<string, Notes> dicNotes;
+        public bool isEdited;
+        private BindingSource srcNotes = new BindingSource();
+
         public IntuitNotes()
         {
             InitializeComponent();
@@ -26,7 +23,7 @@ namespace IntuitNotesApp
 
         private void Add_Click(object sender, EventArgs e)
         {
-           txtTitle.Clear();
+            txtTitle.Clear();
             NotesBody.Clear();
             selectedNote = "";
         }
@@ -40,21 +37,15 @@ namespace IntuitNotesApp
         {
             Notes newNote;
             if (!dicNotes.TryGetValue(selectedNote, out newNote))
-            {
                 newNote = new Notes();
-            }
             newNote.Title = txtTitle.Text;
             newNote.Body.Append(NotesBody.Text);
             DbWrapper.UpsertNotes(newNote);
             isEdited = false;
             if (dicNotes.ContainsKey(newNote.NoteGuid))
-            {
                 dicNotes[newNote.NoteGuid] = newNote;
-            }
             else
-            {
                 dicNotes.Add(newNote.NoteGuid, newNote);
-            }
 
             var NotesList = new BindingList<Notes>(dicNotes.Values.ToList());
             dvNotes.DataSource = NotesList;
@@ -70,14 +61,13 @@ namespace IntuitNotesApp
             dvNotes.DataSource = NotesList;
             dvNotes.Refresh();
         }
+
         //Click cell to save notes
         private void dvNotes_SelectionChanged(object sender, EventArgs e)
         {
-
-          
             foreach (DataGridViewRow row in dvNotes.SelectedRows)
             {
-               selectedNote = row.Cells[1].Value.ToString();
+                selectedNote = row.Cells[1].Value.ToString();
                 Notes displayNote;
                 dicNotes.TryGetValue(selectedNote, out displayNote);
                 txtTitle.Text = displayNote.Title;
@@ -85,7 +75,8 @@ namespace IntuitNotesApp
                 //...
             }
         }
-      /*  private void dvNotes_RowEnter(object sender,
+
+        /*  private void dvNotes_RowEnter(object sender,
         DataGridViewCellEventArgs e)
         {
             for (int i = 0; i < dvNotes.Rows[e.RowIndex].Cells.Count; i++)
@@ -97,17 +88,13 @@ namespace IntuitNotesApp
         private void dvNotes_RowLeave(object sender,
             DataGridViewCellEventArgs e)
         {
-           
-                if (isEdited)
-                {
-                    selectedNote = dvNotes.Rows[e.RowIndex].Cells[1].Value.ToString();
-                    SaveNote();
-                   
-                }
-            
+            if (isEdited)
+            {
+                selectedNote = dvNotes.Rows[e.RowIndex].Cells[1].Value.ToString();
+                SaveNote();
+            }
         }
 
-     
 
         private void NotesBody_KeyPress(object sender, KeyPressEventArgs e)
         {
@@ -118,8 +105,5 @@ namespace IntuitNotesApp
         {
             isEdited = true;
         }
-
-        
-      
     }
 }
