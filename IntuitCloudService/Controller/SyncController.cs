@@ -1,5 +1,13 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Net;
+using System.Net.Http;
+using System.Threading.Tasks;
 using System.Web.Http;
+using IntuitCloudService.SyncBL;
+using IntuitNotesBL.NoteDAl;
+using IntuitNotesBL.NotesModel;
 
 namespace IntuitCloudService.Controller
 {
@@ -11,25 +19,26 @@ namespace IntuitCloudService.Controller
             return new[] {"value1", "value2"};
         }
 
-        // GET api/<controller>/5
-        public string Get(int id)
-        {
-            return "value";
-        }
+      
 
         // POST api/<controller>
-        public void Post([FromBody] string value)
+        public async Task<HttpResponseMessage> SyncData([FromBody] NoteStore noteStore)
         {
+            try
+            {
+                List<Notes> notesForClient = SyncServer.Sync(noteStore);
+                DbWrapper.UpdateSyncTimeStamp(noteStore);
+                return Request.CreateResponse(HttpStatusCode.OK, notesForClient);
+            }
+            catch (Exception ex)
+            {
+                return Request.CreateResponse(HttpStatusCode.BadRequest);
+            }
+
         }
 
-        // PUT api/<controller>/5
-        public void Put(int id, [FromBody] string value)
-        {
-        }
+       
 
-        // DELETE api/<controller>/5
-        public void Delete(int id)
-        {
-        }
+       
     }
 }

@@ -28,7 +28,6 @@
         /// </summary>
         private void InitializeComponent()
         {
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(IntuitNotes));
             this.menuStrip1 = new System.Windows.Forms.MenuStrip();
             this.fileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.editToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -38,12 +37,13 @@
             this.Title = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.ID = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.toolStrip1 = new System.Windows.Forms.ToolStrip();
-            this.Add = new System.Windows.Forms.ToolStripButton();
-            this.Save = new System.Windows.Forms.ToolStripButton();
-            this.Sync = new System.Windows.Forms.ToolStripButton();
+            this.btnEmail = new System.Windows.Forms.Button();
             this.lblTitle = new System.Windows.Forms.Label();
             this.txtTitle = new System.Windows.Forms.TextBox();
             this.NotesBody = new System.Windows.Forms.RichTextBox();
+            this.Add = new System.Windows.Forms.ToolStripButton();
+            this.Save = new System.Windows.Forms.ToolStripButton();
+            this.Sync = new System.Windows.Forms.ToolStripButton();
             this.menuStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainerNotes)).BeginInit();
             this.splitContainerNotes.Panel1.SuspendLayout();
@@ -96,6 +96,7 @@
             // 
             // splitContainerNotes.Panel2
             // 
+            this.splitContainerNotes.Panel2.Controls.Add(this.btnEmail);
             this.splitContainerNotes.Panel2.Controls.Add(this.lblTitle);
             this.splitContainerNotes.Panel2.Controls.Add(this.txtTitle);
             this.splitContainerNotes.Panel2.Controls.Add(this.NotesBody);
@@ -152,31 +153,15 @@
             this.toolStrip1.TabIndex = 0;
             this.toolStrip1.Text = "toolStrip1";
             // 
-            // Add
+            // btnEmail
             // 
-            this.Add.Image = ((System.Drawing.Image)(resources.GetObject("Add.Image")));
-            this.Add.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.Add.Name = "Add";
-            this.Add.Size = new System.Drawing.Size(57, 24);
-            this.Add.Text = "Add";
-            this.Add.Click += new System.EventHandler(this.Add_Click);
-            // 
-            // Save
-            // 
-            this.Save.Image = ((System.Drawing.Image)(resources.GetObject("Save.Image")));
-            this.Save.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.Save.Name = "Save";
-            this.Save.Size = new System.Drawing.Size(60, 24);
-            this.Save.Text = "Save";
-            this.Save.Click += new System.EventHandler(this.Save_Click);
-            // 
-            // Sync
-            // 
-            this.Sync.Image = ((System.Drawing.Image)(resources.GetObject("Sync.Image")));
-            this.Sync.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.Sync.Name = "Sync";
-            this.Sync.Size = new System.Drawing.Size(59, 24);
-            this.Sync.Text = "Sync";
+            this.btnEmail.Location = new System.Drawing.Point(499, 4);
+            this.btnEmail.Name = "btnEmail";
+            this.btnEmail.Size = new System.Drawing.Size(75, 23);
+            this.btnEmail.TabIndex = 3;
+            this.btnEmail.Text = "SendMail";
+            this.btnEmail.UseVisualStyleBackColor = true;
+            this.btnEmail.Click += new System.EventHandler(this.btnEmail_Click);
             // 
             // lblTitle
             // 
@@ -189,7 +174,7 @@
             // 
             // txtTitle
             // 
-            this.txtTitle.Location = new System.Drawing.Point(125, 3);
+            this.txtTitle.Location = new System.Drawing.Point(56, 7);
             this.txtTitle.Name = "txtTitle";
             this.txtTitle.Size = new System.Drawing.Size(402, 20);
             this.txtTitle.TabIndex = 1;
@@ -204,6 +189,33 @@
             this.NotesBody.TabIndex = 0;
             this.NotesBody.Text = "";
             this.NotesBody.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.NotesBody_KeyPress);
+            // 
+            // Add
+            // 
+            this.Add.Image = global::IntuitNotesApp.Properties.Resources.add_icon_13061;
+            this.Add.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.Add.Name = "Add";
+            this.Add.Size = new System.Drawing.Size(57, 24);
+            this.Add.Text = "Add";
+            this.Add.Click += new System.EventHandler(this.Add_Click);
+            // 
+            // Save
+            // 
+            this.Save.Image = global::IntuitNotesApp.Properties.Resources.save_256;
+            this.Save.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.Save.Name = "Save";
+            this.Save.Size = new System.Drawing.Size(60, 24);
+            this.Save.Text = "Save";
+            this.Save.Click += new System.EventHandler(this.Save_Click);
+            // 
+            // Sync
+            // 
+            this.Sync.Image = global::IntuitNotesApp.Properties.Resources.Sync_;
+            this.Sync.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.Sync.Name = "Sync";
+            this.Sync.Size = new System.Drawing.Size(59, 24);
+            this.Sync.Text = "Sync";
+            this.Sync.Click += new System.EventHandler(this.Sync_Click);
             // 
             // IntuitNotes
             // 
@@ -248,6 +260,7 @@
         private System.Windows.Forms.DataGridView dvNotes;
         private System.Windows.Forms.DataGridViewTextBoxColumn Title;
         private System.Windows.Forms.DataGridViewTextBoxColumn ID;
+        private System.Windows.Forms.Button btnEmail;
     }
 }
 

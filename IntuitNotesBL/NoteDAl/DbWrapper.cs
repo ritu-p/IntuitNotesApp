@@ -3,18 +3,19 @@ using System.Collections.Generic;
 using System.Data;
 using System.Data.SQLite;
 using System.Text;
-using IntuitNotesApp.NotesModel;
 
-namespace IntuitNotesApp.NoteDAl
+using IntuitNotesBL.NotesModel;
+
+namespace IntuitNotesBL.NoteDAl
 {
     public static class DbWrapper
     {
         private static SQLiteConnection sqlite_conn;
         private static SQLiteDataReader sqlite_datareader;
 
-        public static void Connect()
+        public static void Connect(string DbName)
         {
-            sqlite_conn = new SQLiteConnection("Data Source=notes.db;Version=3;New=True;Compress=True;");
+            sqlite_conn = new SQLiteConnection("Data Source="+DbName+".db;Version=3;New=True;Compress=True;");
 
             // open the connection:
             sqlite_conn.Open();
@@ -134,48 +135,76 @@ namespace IntuitNotesApp.NoteDAl
                     @"SELECT  last_synctimestamp from  [SyncTimeStamp] where client_id='" + clientId + "'";
                 fmd.CommandType = CommandType.Text;
                 var dataReader = fmd.ExecuteReader();
-                while (dataReader.Read())
-                    return dataReader.GetDateTime(0);
+                if (dataReader.HasRows)
+                {
+                    while (dataReader.Read())
+                        return dataReader.GetDateTime(0).ToUniversalTime();
+                }
+                else
+                {
+                    dataReader.Close();
+                    var insertCMD = sqlite_conn.CreateCommand();
+                    insertCMD.CommandText =
+                        "INSERT INTO [SyncTimeStamp] ('client_id'  ,'last_synctimestamp' ) Values (@clientid,@lastsyncdate)";
+                    // Add another entry into our database 
+                    insertCMD.Parameters.AddWithValue("@clientid", clientId);
+                    insertCMD.Parameters.AddWithValue("@lastsyncdate", DateTime.Now.ToUniversalTime());
+
+                    //     com.Parameters.AddWithValue("@modified_date", DateTime.Now.ToUniversalTime());
+                    insertCMD.ExecuteNonQuery(); // Execute the query
+                }
+               
+                    
             }
-            return DateTime.Now;
+            return DateTime.Now.ToUniversalTime();
         }
 
         public static string GetClientId()
         {
             var client_id = Guid.NewGuid().ToString();
-            using (var fmd = sqlite_conn.CreateCommand())
+            try
             {
-                fmd.CommandText =
-                    @"SELECT top 1  client_id from  [SyncTimeStamp]";
-                fmd.CommandType = CommandType.Text;
-                var dataReader = fmd.ExecuteReader();
-                if (dataReader.HasRows)
-                {
-                    while (dataReader.Read())
-                        client_id = dataReader.GetString(0);
-                }
-                else
+           
+                using (var fmd = sqlite_conn.CreateCommand())
                 {
                     fmd.CommandText =
-                        "INSERT INTO [SyncTimeStamp] ('client_id'  ,'last_synctimestamp' ) Values (@clientid,@lastsyncdate)";
-                    // Add another entry into our database 
-                    fmd.Parameters.AddWithValue("@clientid", client_id);
-                    fmd.Parameters.AddWithValue("@lastsyncdate", DateTime.Now.ToUniversalTime());
+                        @"SELECT client_id from  [SyncTimeStamp] LIMIT 1";
+                    fmd.CommandType = CommandType.Text;
+                    var dataReader = fmd.ExecuteReader();
+                    if (dataReader.HasRows)
+                    {
+                        while (dataReader.Read())
+                            client_id = dataReader.GetString(0);
+                    }
+                    else
+                    {
+                        dataReader.Close();
+                        var insertCMD = sqlite_conn.CreateCommand();
+                        insertCMD.CommandText =
+                            "INSERT INTO [SyncTimeStamp] ('client_id'  ,'last_synctimestamp' ) Values (@clientid,@lastsyncdate)";
+                        // Add another entry into our database 
+                        insertCMD.Parameters.AddWithValue("@clientid", client_id);
+                        insertCMD.Parameters.AddWithValue("@lastsyncdate", DateTime.Now.ToUniversalTime());
 
-                    //     com.Parameters.AddWithValue("@modified_date", DateTime.Now.ToUniversalTime());
-                    fmd.ExecuteNonQuery(); // Execute the query
+                        //     com.Parameters.AddWithValue("@modified_date", DateTime.Now.ToUniversalTime());
+                        insertCMD.ExecuteNonQuery(); // Execute the query
+                    }
                 }
+            }
+            catch (Exception ex)
+            {
             }
             return client_id;
         }
 
-        public static void UpdateSyncTimeStamp()
+        public static void UpdateSyncTimeStamp(NoteStore noteStore)
         {
             try
             {
                 var com = new SQLiteCommand(sqlite_conn);
-                com.CommandText = "Update [SyncTimeStamp] set last_synctimestamp=DATETIME('NOW'),clinet_id='" +
-                                  NoteStore.ClientId;
+                com.CommandText = "Update [SyncTimeStamp] set last_synctimestamp=DATETIME('NOW'),client_id='" +
+                                  noteStore.ClientId + "'";
+                             ;
                 // Add the first entry into our database 
                 var updated = com.ExecuteNonQuery(); // Execute the query
             }

@@ -1,22 +1,25 @@
 ﻿using System;
 using System.ComponentModel;
+using System.Configuration;
 using System.Timers;
+using IntuitNotesBL.NoteDAl;
 
-namespace IntuitNotesApp.NoteDAl
+namespace IntuitNotesBL.NoteDAl
 {
     public static class SyncScheduler
     {
         private static BackgroundWorker worker;
         private static readonly Timer objTimer = new Timer();
         private static readonly string clientId = DbWrapper.GetClientId();
-
+        private static long syncInterval = Convert.ToInt64( ConfigurationManager.AppSettings["Client.SyncInterval"]);
+        
         public static void StartSyncTimer()
         {
             worker = new BackgroundWorker();
             worker.DoWork += worker_DoWork;
 
 
-            var iTimerInterval = Convert.ToInt32(10000); //TODO:configurable
+            var iTimerInterval = Convert.ToInt32(syncInterval); //TODO:configurable
             objTimer.Interval = iTimerInterval;
             objTimer.Elapsed += objTimer_Elapsed;
             objTimer.Start();
@@ -31,6 +34,7 @@ namespace IntuitNotesApp.NoteDAl
         private static void worker_DoWork(object sender, DoWorkEventArgs e)
         {
             NotesSync.Sync(clientId);
+           
         }
     }
 }

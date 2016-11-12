@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Text;
 
-namespace IntuitNotesApp.NotesModel
+namespace IntuitNotesBL.NotesModel
 {
     public class Notes
     {

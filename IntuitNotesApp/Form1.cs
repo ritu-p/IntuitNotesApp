@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Linq;
 using System.Windows.Forms;
-using IntuitNotesApp.NoteDAl;
-using IntuitNotesApp.NotesModel;
+
+using IntuitNotesBL.NoteDAl;
+using IntuitNotesBL.NotesModel;
 
 namespace IntuitNotesApp
 {
@@ -13,8 +15,7 @@ namespace IntuitNotesApp
         public static string selectedNote = "";
         private Dictionary<string, Notes> dicNotes;
         public bool isEdited;
-        private BindingSource srcNotes = new BindingSource();
-
+        private static readonly string clientId = DbWrapper.GetClientId();
         public IntuitNotes()
         {
             InitializeComponent();
@@ -47,6 +48,11 @@ namespace IntuitNotesApp
             else
                 dicNotes.Add(newNote.NoteGuid, newNote);
 
+            UpdateGridView();
+        }
+
+        private void UpdateGridView()
+        {
             var NotesList = new BindingList<Notes>(dicNotes.Values.ToList());
             dvNotes.DataSource = NotesList;
             dvNotes.Refresh();
@@ -54,12 +60,11 @@ namespace IntuitNotesApp
 
         private void IntuitNotes_Load(object sender, EventArgs e)
         {
-            DbWrapper.Connect();
+            DbWrapper.Connect("notes");
 
+SyncScheduler.StartSyncTimer();
             dicNotes = DbWrapper.GetNotesForDisplay();
-            var NotesList = new BindingList<Notes>(dicNotes.Values.ToList());
-            dvNotes.DataSource = NotesList;
-            dvNotes.Refresh();
+            UpdateGridView();
         }
 
         //Click cell to save notes
@@ -104,6 +109,20 @@ namespace IntuitNotesApp
         private void txtTitle_KeyPress(object sender, KeyPressEventArgs e)
         {
             isEdited = true;
+        }
+
+        private void btnEmail_Click(object sender, EventArgs e)
+        {
+            string subject = "Intuit Notes App shares " + txtTitle.Text;
+            string body = NotesBody.Text;
+            string command = "mailto:?subject="+subject+"&body="+body;
+            Process.Start(command); 
+        }
+
+        private void Sync_Click(object sender, EventArgs e)
+        {
+        dicNotes=    NotesSync.Sync(clientId);
+        UpdateGridView();  
         }
     }
 }
