@@ -56,6 +56,7 @@
     <Compile Include="NoteDAl\DbWrapper.cs" />
     <Compile Include="NoteDAl\HttpClientUtil.cs" />
     <Compile Include="NoteDAl\HttpUtilityOutput.cs" />
+    <Compile Include="NoteDAl\IHttpClientUtil.cs" />
     <Compile Include="NoteDAl\NotesSync.cs" />
     <Compile Include="NotesModel\NoteStore.cs" />
     <Compile Include="NoteDAl\SyncScheduler.cs" />

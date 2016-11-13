@@ -60,7 +60,7 @@ namespace IntuitNotesApp
 
         private void IntuitNotes_Load(object sender, EventArgs e)
         {
-            DbWrapper.Connect("notes");
+          DbWrapper.Connect("notes.db");
 
 SyncScheduler.StartSyncTimer();
             dicNotes = DbWrapper.GetNotesForDisplay();
@@ -121,7 +121,8 @@ SyncScheduler.StartSyncTimer();
 
         private void Sync_Click(object sender, EventArgs e)
         {
-        dicNotes=    NotesSync.Sync(clientId);
+            HttpClientUtil httpClientUtil =new HttpClientUtil();
+            dicNotes = new NotesSync(httpClientUtil).Sync(clientId);
         UpdateGridView();  
         }
     }

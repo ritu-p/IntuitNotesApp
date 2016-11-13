@@ -14,7 +14,12 @@ namespace IntuitNotesBL.NoteDAl
         private static readonly List<Notes> notes = DbWrapper.GetNotesForSync();
         private static List<Notes> noteToSync;
         private static readonly NoteStore noteStore = new NoteStore();
+        private IHttpClientUtil httpClientUtil;
 
+        public NotesSync(IHttpClientUtil httpClient)
+        {
+            httpClientUtil = httpClient;
+        }
         private static void syncFromCloud(List<Notes> notesFromServer)
         {
             foreach (var note in notesFromServer)
@@ -23,22 +28,22 @@ namespace IntuitNotesBL.NoteDAl
             }
         }
 
-        private static async void syncToCloud()
+        private async void syncToCloud()
         {
             if ((noteToSync != null))
             {
                 var json = JsonConvert.SerializeObject(noteStore);
                 var url = new Uri("http://localhost:9090/api/Sync/SyncData");
-                var result = await HttpClientUtil.PostHttpAsync(url, json).ConfigureAwait(false);
+                var result = await httpClientUtil.PostHttpAsync(url, json).ConfigureAwait(false);
                 if (result.Status == HttpStatusCode.OK)
                 {
-                 List<Notes> notesFromServer  =JsonConvert.DeserializeObject<List<Notes>>(result.Content);
+                    List<Notes> notesFromServer = JsonConvert.DeserializeObject<List<Notes>>(result.Content);
                     syncFromCloud(notesFromServer);
                 }
             }
         }
 
-        public static Dictionary<string, Notes> Sync(string clientId)
+        public Dictionary<string, Notes> Sync(string clientId)
         {
             try
             {
@@ -50,17 +55,17 @@ namespace IntuitNotesBL.NoteDAl
                 }
                 else
                 {
-                    noteToSync=new List<Notes>();
+                    noteToSync = new List<Notes>();
                 }
 
                 noteStore.LastUpDateTime = lastSyncTime;
-                    noteStore.LstNotes = noteToSync;
-                    noteStore.ClientId = clientId;
-                    syncToCloud();
-                
+                noteStore.LstNotes = noteToSync;
+                noteStore.ClientId = clientId;
+                syncToCloud();
+
                 DbWrapper.UpdateSyncTimeStamp(noteStore);
-            
-            return  DbWrapper.GetNotesForDisplay();
+
+                return DbWrapper.GetNotesForDisplay();
             }
             catch (Exception)
             {

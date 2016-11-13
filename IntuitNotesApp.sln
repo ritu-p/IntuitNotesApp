@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IntuitCloudService", "Intui
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IntuitNotesBL", "IntuitNotesBL\IntuitNotesBL.csproj", "{5D2AADB9-D90B-4F56-BAF3-6302D2730F74}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IntuitNoteAPPUnitTest", "IntuitNoteAPPUnitTest\IntuitNoteAPPUnitTest.csproj", "{6D31B8E1-8D4C-46E7-8989-5D517D63714A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -25,6 +27,10 @@ Global
 		{5D2AADB9-D90B-4F56-BAF3-6302D2730F74}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5D2AADB9-D90B-4F56-BAF3-6302D2730F74}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5D2AADB9-D90B-4F56-BAF3-6302D2730F74}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6D31B8E1-8D4C-46E7-8989-5D517D63714A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6D31B8E1-8D4C-46E7-8989-5D517D63714A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6D31B8E1-8D4C-46E7-8989-5D517D63714A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6D31B8E1-8D4C-46E7-8989-5D517D63714A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

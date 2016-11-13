@@ -7,9 +7,9 @@ using System.Threading.Tasks;
 
 namespace IntuitNotesBL.NoteDAl
 {
-    internal class HttpClientUtil
+    public class HttpClientUtil : IHttpClientUtil
     {
-        public static async Task<HttpUtilityOutput> PostHttpAsync(Uri url, string jsonContent)
+        public  async Task<HttpUtilityOutput> PostHttpAsync(Uri url, string jsonContent)
         {
             var _httpClient = new HttpClient();
             var returnValue = new HttpUtilityOutput();
@@ -28,7 +28,6 @@ namespace IntuitNotesBL.NoteDAl
             {
                 returnValue.Status = HttpStatusCode.InternalServerError;
             }
-
             return returnValue;
         }
     }

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Data;
 using System.Data.SQLite;
 using System.Text;
@@ -10,22 +11,34 @@ namespace IntuitNotesBL.NoteDAl
 {
     public static class DbWrapper
     {
+        private static string DbName = GetDbName();
         private static SQLiteConnection sqlite_conn;
         private static SQLiteDataReader sqlite_datareader;
 
-        public static void Connect(string DbName)
+        private static string GetDbName()
         {
-            sqlite_conn = new SQLiteConnection("Data Source="+DbName+".db;Version=3;New=True;Compress=True;");
+            if (ConfigurationManager.AppSettings["isServer"] != null &&
+                Convert.ToBoolean(ConfigurationManager.AppSettings["isServer"]))
+            {
+                return !String.IsNullOrEmpty(ConfigurationManager.AppSettings["Server.dbName"].ToString()) ? ConfigurationManager.AppSettings["Server.dbName"].ToString() : "|DataDirectory|servernotes.db";
+            }
+            return !String.IsNullOrEmpty(ConfigurationManager.AppSettings["Client.dbName"].ToString()) ? ConfigurationManager.AppSettings["Client.dbName"].ToString() : "notes.db";
+        }
+        public static void Connect(string dbName)
+        {
+            sqlite_conn = new SQLiteConnection("Data Source=" + dbName + ";Version=3;New=True;Compress=True;");
 
             // open the connection:
             sqlite_conn.Open();
 
             CreateNoteSchema();
             CreateSyncTimeStampStore();
+
         }
 
         private static void CreateNoteSchema()
         {
+            InitialzeDb();
             using (
                 var mCmd =
                     new SQLiteCommand(
@@ -36,8 +49,17 @@ namespace IntuitNotesBL.NoteDAl
             }
         }
 
+        private static void InitialzeDb()
+        {
+            if (sqlite_conn == null)
+            {
+                Connect(DbName);
+            }
+        }
+
         private static void CreateSyncTimeStampStore()
         {
+            InitialzeDb();
             using (
                 var mCmd =
                     new SQLiteCommand(
@@ -52,6 +74,7 @@ namespace IntuitNotesBL.NoteDAl
         {
             try
             {
+                InitialzeDb();
                 var com = new SQLiteCommand(sqlite_conn);
                 com.CommandText = "Update [Notes] set 'title'='" + note.Title + "',body='" + note.Body +
                                   "','is_deleted'=" + Convert.ToInt64(note.IsDeleted) +
@@ -61,11 +84,12 @@ namespace IntuitNotesBL.NoteDAl
                 if (updated != 1)
                 {
                     com.CommandText =
-                        "INSERT INTO [Notes] ('notes_id'  ,'title', 'body' ) Values (@notes_id,@title,@body)";
+                        "INSERT INTO [Notes] ('notes_id'  ,'title', 'body','is_deleted' ) Values (@notes_id,@title,@body,@deleted)";
                     // Add another entry into our database 
                     com.Parameters.AddWithValue("@notes_id", note.NoteGuid);
                     com.Parameters.AddWithValue("@title", note.Title);
                     com.Parameters.AddWithValue("@body", note.Body);
+                    com.Parameters.AddWithValue("@deleted", Convert.ToInt64(note.IsDeleted));
 
                     //     com.Parameters.AddWithValue("@modified_date", DateTime.Now.ToUniversalTime());
                     com.ExecuteNonQuery(); // Execute the query
@@ -79,6 +103,7 @@ namespace IntuitNotesBL.NoteDAl
 
         public static Dictionary<string, Notes> GetNotesForDisplay()
         {
+            InitialzeDb();
             var dicNotes = new Dictionary<string, Notes>();
             using (var fmd = sqlite_conn.CreateCommand())
             {
@@ -104,6 +129,7 @@ namespace IntuitNotesBL.NoteDAl
 
         public static List<Notes> GetNotesForSync()
         {
+            InitialzeDb();
             var lstNotes = new List<Notes>();
             using (var fmd = sqlite_conn.CreateCommand())
             {
@@ -129,6 +155,7 @@ namespace IntuitNotesBL.NoteDAl
 
         public static DateTime GetLastSyncTimestamp(string clientId)
         {
+            InitialzeDb();
             using (var fmd = sqlite_conn.CreateCommand())
             {
                 fmd.CommandText =
@@ -153,18 +180,19 @@ namespace IntuitNotesBL.NoteDAl
                     //     com.Parameters.AddWithValue("@modified_date", DateTime.Now.ToUniversalTime());
                     insertCMD.ExecuteNonQuery(); // Execute the query
                 }
-               
-                    
+
+
             }
             return DateTime.Now.ToUniversalTime();
         }
 
         public static string GetClientId()
         {
+            InitialzeDb();
             var client_id = Guid.NewGuid().ToString();
             try
             {
-           
+
                 using (var fmd = sqlite_conn.CreateCommand())
                 {
                     fmd.CommandText =
@@ -199,14 +227,36 @@ namespace IntuitNotesBL.NoteDAl
 
         public static void UpdateSyncTimeStamp(NoteStore noteStore)
         {
+            InitialzeDb();
             try
             {
                 var com = new SQLiteCommand(sqlite_conn);
                 com.CommandText = "Update [SyncTimeStamp] set last_synctimestamp=DATETIME('NOW'),client_id='" +
                                   noteStore.ClientId + "'";
-                             ;
+                ;
                 // Add the first entry into our database 
                 var updated = com.ExecuteNonQuery(); // Execute the query
+            }
+            catch (Exception ex)
+            {
+            }
+        }
+
+        public static void ClearTables()
+        {
+            InitialzeDb();
+            try
+            {
+                var com = new SQLiteCommand(sqlite_conn);
+                com.CommandText = "delete from Notes";
+                ;
+                // Add the first entry into our database 
+                var updated = com.ExecuteNonQuery(); // Execute the query
+                var com2 = new SQLiteCommand(sqlite_conn);
+                com2.CommandText = "delete from [SyncTimeStamp]";
+                ;
+
+                var updated1 = com2.ExecuteNonQuery(); // Execute the query
             }
             catch (Exception ex)
             {

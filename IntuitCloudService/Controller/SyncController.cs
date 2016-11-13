@@ -13,13 +13,6 @@ namespace IntuitCloudService.Controller
 {
     public class SyncController : ApiController
     {
-        // GET api/<controller>
-        public IEnumerable<string> Get()
-        {
-            return new[] {"value1", "value2"};
-        }
-
-      
 
         // POST api/<controller>
         public async Task<HttpResponseMessage> SyncData([FromBody] NoteStore noteStore)
@@ -37,8 +30,5 @@ namespace IntuitCloudService.Controller
 
         }
 
-       
-
-       
     }
 }

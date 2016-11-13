@@ -34,7 +34,9 @@ namespace IntuitNotesBL.NoteDAl
 
         private static void worker_DoWork(object sender, DoWorkEventArgs e)
         {
-            NotesSync.Sync(clientId);
+
+            new NotesSync(new HttpClientUtil()).Sync(clientId);
+          //  NotesSync.Sync(clientId);
            
         }
     }
