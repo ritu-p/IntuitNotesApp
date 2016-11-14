@@ -13,8 +13,7 @@ namespace IntuitNotesApp
         [STAThread]
         private static void Main()
         {
-           
-
+            /*Self Hosting the cloud service for ease of demo*/
             var config = new HttpSelfHostConfiguration("http://localhost:9090");
             IntuitCloudService.WebAPIConfigcs.Register(config);
 

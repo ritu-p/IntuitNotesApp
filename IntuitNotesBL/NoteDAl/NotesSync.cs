@@ -17,21 +17,15 @@ namespace IntuitNotesBL.NoteDAl
         private static List<Notes> noteToSync;
         private static readonly NoteStore noteStore = new NoteStore();
         private IHttpClientUtil httpClientUtil;
-        
+
 
         public NotesSync(IHttpClientUtil httpClient)
         {
             httpClientUtil = httpClient;
         }
-        private static void syncFromCloud(List<Notes> notesFromServer)
-        {
-            foreach (var note in notesFromServer)
-            {
-                dbClient.UpsertNotes(note);
-            }
-        }
 
-      public async Task<Dictionary<string, Notes>> Sync(string clientId)
+
+        public async Task<Dictionary<string, Notes>> Sync(string clientId)
         {
             try
             {
@@ -61,11 +55,18 @@ namespace IntuitNotesBL.NoteDAl
                 }
 
 
-              return dbClient.GetNotesForDisplay();
+                return dbClient.GetNotesForDisplay();
             }
             catch (Exception)
             {
                 throw;
+            }
+        }
+        private static void syncFromCloud(List<Notes> notesFromServer)
+        {
+            foreach (var note in notesFromServer)
+            {
+                dbClient.UpsertNotes(note);
             }
         }
     }

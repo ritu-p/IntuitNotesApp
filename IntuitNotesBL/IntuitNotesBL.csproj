@@ -54,9 +54,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="NoteDAl\DbWrapper.cs" />
-    <Compile Include="NoteDAl\HttpClientUtil.cs" />
-    <Compile Include="NoteDAl\HttpUtilityOutput.cs" />
-    <Compile Include="NoteDAl\IHttpClientUtil.cs" />
+    <Compile Include="Utils\HttpClientUtil.cs" />
+    <Compile Include="Utils\HttpUtilityOutput.cs" />
+    <Compile Include="Utils\IHttpClientUtil.cs" />
     <Compile Include="NoteDAl\NotesSync.cs" />
     <Compile Include="NotesModel\NoteStore.cs" />
     <Compile Include="NotesModel\Notes.cs" />

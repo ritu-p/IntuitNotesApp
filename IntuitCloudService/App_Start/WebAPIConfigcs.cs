@@ -5,7 +5,7 @@ using System.Web;
 using System.Web.Http;
 using IntuitNotesBL.NoteDAl;
 
-
+//
 namespace IntuitCloudService
 {
     public class WebAPIConfigcs
@@ -18,7 +18,6 @@ namespace IntuitCloudService
                 defaults: new { id = RouteParameter.Optional }
             );
 
-        // DbWrapper.Connect("|DataDirectory|servernotes.db");
         }
     }
 }

@@ -24,24 +24,20 @@ namespace IntuitNoteAPPUnitTest
 
 
         protected TransactionScope TransactionScope;
-        DbWrapper dbClient ;
-        DbWrapper dbServer ;
 
         [TestInitialize]
         public void TestSetup()
         {
 
             TransactionScope = new TransactionScope(TransactionScopeOption.RequiresNew);
-   //   dbClient = new DbWrapper("notes.db");
-             dbServer = new DbWrapper("|DataDirectory|servernotes.db");
+
         }
 
         [TestCleanup]
         public void TestCleanup()
         {
             TransactionScope.Dispose();
-         //   dbClient.Close();
-          dbServer.Close();
+
         }
         private void RegisterSelfhostServer()
         {
@@ -58,7 +54,7 @@ namespace IntuitNoteAPPUnitTest
         [TestMethod]
         public void SyncNewRecodsTOCloud()
         {
-            TransactionScope = new TransactionScope(TransactionScopeOption.RequiresNew);
+
             RegisterSelfhostServer();
             ConfigurationManager.AppSettings["isServer"] = "true";
             ConfigurationManager.RefreshSection("AppSettings");
@@ -84,10 +80,8 @@ namespace IntuitNoteAPPUnitTest
                 var itemServerReturned = notesFromServer.SingleOrDefault(x => x.NoteGuid == "b68f9b83-667c-43f3-98ca-422b31ad37a6");
                 Assert.IsNull(itemServerReturned);
             }
-            List<Notes> resnotes = dbServer.GetNotesForSync();
 
-      //      var itemServerDB = resnotes.SingleOrDefault(x => x.NoteGuid == "b68f9b83-667c-43f3-98ca-422b31ad37a6");
-        //    Assert.IsNotNull(itemServerDB);
+
 
         }
 
@@ -113,9 +107,6 @@ namespace IntuitNoteAPPUnitTest
             NotesSync notesSync = new NotesSync(mockhttpclientUtil.Object);
             Dictionary<string, Notes> resultDic = await notesSync.Sync("TestClient1").ConfigureAwait(false);
             Assert.IsTrue(resultDic.ContainsKey(client1Note.NoteGuid));
-
-        //    DateTime dateSync = DbWrapper.GetLastSyncTimestamp("TestClient1");
-        //    Assert.IsTrue(dateSync > dtBeforSync);
 
         }
         [TestMethod]

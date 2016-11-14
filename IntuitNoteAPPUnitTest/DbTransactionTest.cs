@@ -35,6 +35,7 @@ namespace IntuitNoteAPPUnitTest
         public void TestCleanup()
         {
             dbClient.ClearTables();
+            dbClient.Close();
             TransactionScope.Dispose();
          
         }

@@ -14,7 +14,12 @@ namespace IntuitCloudService.Controller
     public class SyncController : ApiController
     {
 
-        // POST api/<controller>
+        // POST api/SyncData/Sync
+        /// <summary>
+        /// Syncs data from client to the Cloud Store and Vice Versa
+        /// </summary>
+        /// <param name="noteStore"></param>
+        /// <returns></returns>
         public async Task<HttpResponseMessage> SyncData([FromBody] NoteStore noteStore)
         {
             try
