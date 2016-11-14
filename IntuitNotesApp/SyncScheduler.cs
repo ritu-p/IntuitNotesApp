@@ -18,7 +18,7 @@ namespace IntuitNotesApp.NoteDAl
         private static readonly string clientId = DbWrapper.GetClientId();
         private static long syncInterval = Convert.ToInt64( ConfigurationManager.AppSettings["Client.SyncInterval"]);
         private static DataGridView dvView;
-        public static void StartSyncTimer(DataGridView dvDataGridView)
+        public static void StartSyncTimer(DataGridView dvDataGridView) 
         {
             worker = new BackgroundWorker();
             worker.DoWork += worker_DoWork;
