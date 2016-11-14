@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
+using System.Threading.Tasks;
 using IntuitNotesBL.NoteDAl;
 using IntuitNotesBL.NotesModel;
 using Newtonsoft.Json;
@@ -10,11 +11,13 @@ namespace IntuitNotesBL.NoteDAl
 {
     public class NotesSync
     {
+        private static DbWrapper dbClient = new DbWrapper("notes.db");
         private static DateTime lastSyncTime;
-        private static readonly List<Notes> notes = DbWrapper.GetNotesForSync();
+        private static readonly List<Notes> notes = dbClient.GetNotesForSync();
         private static List<Notes> noteToSync;
         private static readonly NoteStore noteStore = new NoteStore();
         private IHttpClientUtil httpClientUtil;
+        
 
         public NotesSync(IHttpClientUtil httpClient)
         {
@@ -24,30 +27,15 @@ namespace IntuitNotesBL.NoteDAl
         {
             foreach (var note in notesFromServer)
             {
-                DbWrapper.UpsertNotes(note);
+                dbClient.UpsertNotes(note);
             }
         }
 
-        private async void syncToCloud()
-        {
-            if ((noteToSync != null))
-            {
-                var json = JsonConvert.SerializeObject(noteStore);
-                var url = new Uri("http://localhost:9090/api/Sync/SyncData");
-                var result = await httpClientUtil.PostHttpAsync(url, json).ConfigureAwait(false);
-                if (result.Status == HttpStatusCode.OK)
-                {
-                    List<Notes> notesFromServer = JsonConvert.DeserializeObject<List<Notes>>(result.Content);
-                    syncFromCloud(notesFromServer);
-                }
-            }
-        }
-
-        public Dictionary<string, Notes> Sync(string clientId)
+      public async Task<Dictionary<string, Notes>> Sync(string clientId)
         {
             try
             {
-                lastSyncTime = DbWrapper.GetLastSyncTimestamp(clientId);
+                lastSyncTime = dbClient.GetLastSyncTimestamp(clientId);
                 var lstSync = notes.Select(n => n).Where(f => f.ModifiedDate > lastSyncTime);
                 if ((lstSync != null) && (lstSync.Count() > 0))
                 {
@@ -61,11 +49,19 @@ namespace IntuitNotesBL.NoteDAl
                 noteStore.LastUpDateTime = lastSyncTime;
                 noteStore.LstNotes = noteToSync;
                 noteStore.ClientId = clientId;
-                syncToCloud();
+                var json = JsonConvert.SerializeObject(noteStore);
+                var url = new Uri("http://localhost:9090/api/Sync/SyncData");
+                var result = await httpClientUtil.PostHttpAsync(url, json).ConfigureAwait(false);
+                if (result.Status == HttpStatusCode.OK)
+                {
+                    List<Notes> notesFromServer = JsonConvert.DeserializeObject<List<Notes>>(result.Content);
+                    syncFromCloud(notesFromServer);
 
-                DbWrapper.UpdateSyncTimeStamp(noteStore);
+                    dbClient.UpdateSyncTimeStamp(noteStore);
+                }
 
-                return DbWrapper.GetNotesForDisplay();
+
+              return dbClient.GetNotesForDisplay();
             }
             catch (Exception)
             {

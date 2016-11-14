@@ -9,13 +9,18 @@ using IntuitNotesBL.NotesModel;
 
 namespace IntuitNotesBL.NoteDAl
 {
-    public static class DbWrapper
+    public  class DbWrapper
     {
-        private static string DbName = GetDbName();
-        private static SQLiteConnection sqlite_conn;
-        private static SQLiteDataReader sqlite_datareader;
+        private static string dbName;
+        private  SQLiteConnection sqlite_conn;
+        private  SQLiteDataReader sqlite_datareader;
 
-        private static string GetDbName()
+        public DbWrapper(String Dbname)
+        {
+            dbName = Dbname;
+            Connect();
+        }
+     /*   private static string GetDbName()
         {
             if (ConfigurationManager.AppSettings["isServer"] != null &&
                 Convert.ToBoolean(ConfigurationManager.AppSettings["isServer"]))
@@ -23,8 +28,8 @@ namespace IntuitNotesBL.NoteDAl
                 return !String.IsNullOrEmpty(ConfigurationManager.AppSettings["Server.dbName"].ToString()) ? ConfigurationManager.AppSettings["Server.dbName"].ToString() : "|DataDirectory|servernotes.db";
             }
             return !String.IsNullOrEmpty(ConfigurationManager.AppSettings["Client.dbName"].ToString()) ? ConfigurationManager.AppSettings["Client.dbName"].ToString() : "notes.db";
-        }
-        public static void Connect(string dbName)
+        }*/
+        public  void Connect()
         {
             sqlite_conn = new SQLiteConnection("Data Source=" + dbName + ";Version=3;New=True;Compress=True;");
 
@@ -36,7 +41,7 @@ namespace IntuitNotesBL.NoteDAl
 
         }
 
-        private static void CreateNoteSchema()
+        private  void CreateNoteSchema()
         {
             InitialzeDb();
             using (
@@ -49,15 +54,15 @@ namespace IntuitNotesBL.NoteDAl
             }
         }
 
-        private static void InitialzeDb()
+        private  void InitialzeDb()
         {
             if (sqlite_conn == null)
             {
-                Connect(DbName);
+                Connect();
             }
         }
 
-        private static void CreateSyncTimeStampStore()
+        private  void CreateSyncTimeStampStore()
         {
             InitialzeDb();
             using (
@@ -70,7 +75,7 @@ namespace IntuitNotesBL.NoteDAl
             }
         }
 
-        public static void UpsertNotes(Notes note)
+        public  void UpsertNotes(Notes note)
         {
             try
             {
@@ -101,7 +106,7 @@ namespace IntuitNotesBL.NoteDAl
             }
         }
 
-        public static Dictionary<string, Notes> GetNotesForDisplay()
+        public  Dictionary<string, Notes> GetNotesForDisplay()
         {
             InitialzeDb();
             var dicNotes = new Dictionary<string, Notes>();
@@ -127,7 +132,7 @@ namespace IntuitNotesBL.NoteDAl
             return dicNotes;
         }
 
-        public static List<Notes> GetNotesForSync()
+        public  List<Notes> GetNotesForSync()
         {
             InitialzeDb();
             var lstNotes = new List<Notes>();
@@ -153,7 +158,7 @@ namespace IntuitNotesBL.NoteDAl
             return lstNotes;
         }
 
-        public static DateTime GetLastSyncTimestamp(string clientId)
+        public  DateTime GetLastSyncTimestamp(string clientId)
         {
             InitialzeDb();
             using (var fmd = sqlite_conn.CreateCommand())
@@ -186,7 +191,7 @@ namespace IntuitNotesBL.NoteDAl
             return DateTime.Now.ToUniversalTime();
         }
 
-        public static string GetClientId()
+        public  string GetClientId()
         {
             InitialzeDb();
             var client_id = Guid.NewGuid().ToString();
@@ -225,7 +230,7 @@ namespace IntuitNotesBL.NoteDAl
             return client_id;
         }
 
-        public static void UpdateSyncTimeStamp(NoteStore noteStore)
+        public  void UpdateSyncTimeStamp(NoteStore noteStore)
         {
             InitialzeDb();
             try
@@ -242,7 +247,7 @@ namespace IntuitNotesBL.NoteDAl
             }
         }
 
-        public static void ClearTables()
+        public  void ClearTables()
         {
             InitialzeDb();
             try
@@ -261,6 +266,12 @@ namespace IntuitNotesBL.NoteDAl
             catch (Exception ex)
             {
             }
+        }
+
+        public void Close()
+        {
+            sqlite_conn.Close();
+            GC.Collect();
         }
     }
 }

@@ -16,27 +16,34 @@ namespace IntuitNoteAPPUnitTest
     {
 
         protected TransactionScope TransactionScope;
-
+        DbWrapper dbClient;
+        DbWrapper dbServer;
 
         [TestInitialize]
         public void TestSetup()
         {
-            DbWrapper.ClearTables();
+            dbClient = new DbWrapper("notes.db");
+            dbClient.ClearTables();
             TransactionScope = new TransactionScope(TransactionScopeOption.RequiresNew);
+       
+
         }
 
+
+  
         [TestCleanup]
         public void TestCleanup()
         {
+            dbClient.ClearTables();
             TransactionScope.Dispose();
-            DbWrapper.ClearTables();
+         
         }
 
         [TestMethod]
         public void InsertNewClient()
         {
-            string newClientId = DbWrapper.GetClientId();
-            DateTime lastsync = DbWrapper.GetLastSyncTimestamp(newClientId);
+            string newClientId = dbClient.GetClientId();
+            DateTime lastsync = dbClient.GetLastSyncTimestamp(newClientId);
             Assert.IsTrue(DateTime.UtcNow > lastsync);
 
         }
@@ -44,8 +51,9 @@ namespace IntuitNoteAPPUnitTest
         [TestMethod]
         public void GetExistingClient()
         {
-            string newClientId = DbWrapper.GetClientId();
-            string updatedClientid = DbWrapper.GetClientId();
+            dbClient.ClearTables();
+            string newClientId = dbClient.GetClientId();
+            string updatedClientid = dbClient.GetClientId();
             Assert.AreEqual(newClientId, updatedClientid);
         }
 
@@ -53,8 +61,8 @@ namespace IntuitNoteAPPUnitTest
         public void GetLastSyncForNewClient()
         {
 
-            DateTime dateTime = DbWrapper.GetLastSyncTimestamp("New-ClientId");
-            string newClientId = DbWrapper.GetClientId();
+            DateTime dateTime = dbClient.GetLastSyncTimestamp("New-ClientId");
+            string newClientId = dbClient.GetClientId();
             Assert.AreEqual(newClientId, "New-ClientId");
         }
     }

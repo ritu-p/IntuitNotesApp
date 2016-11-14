@@ -20,7 +20,7 @@ namespace IntuitCloudService.Controller
             try
             {
                 List<Notes> notesForClient = SyncServer.Sync(noteStore);
-                DbWrapper.UpdateSyncTimeStamp(noteStore);
+
                 return Request.CreateResponse(HttpStatusCode.OK, notesForClient);
             }
             catch (Exception ex)

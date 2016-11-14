@@ -15,7 +15,7 @@ namespace IntuitCloudService.App_Start
         protected void Application_Start(object sender, EventArgs e)
         {
             WebAPIConfigcs.Register(GlobalConfiguration.Configuration);
-          //  DbWrapper.Connect("|DataDirectory|servernotes.db");
+          //  DbWrapperServer.Connect("|DataDirectory|servernotes.db");
 
         }
 

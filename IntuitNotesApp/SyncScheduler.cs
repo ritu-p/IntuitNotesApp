@@ -9,20 +9,22 @@ using IntuitNotesBL.NoteDAl;
 using IntuitNotesBL.NotesModel;
 using Timer = System.Timers.Timer;
 
-namespace IntuitNotesApp.NoteDAl
+namespace IntuitNotesApp
 {
     public static class SyncScheduler
     {
         private static BackgroundWorker worker;
         private static readonly Timer objTimer = new Timer();
-        private static readonly string clientId = DbWrapper.GetClientId();
+        private static DbWrapper dbClient = new DbWrapper("notes.db");
+        private static readonly string clientId = dbClient.GetClientId();
         private static long syncInterval = Convert.ToInt64( ConfigurationManager.AppSettings["Client.SyncInterval"]);
-        private static DataGridView dvView;
-        public static void StartSyncTimer(DataGridView dvDataGridView) 
+
+        public static void StartSyncTimer() 
         {
             worker = new BackgroundWorker();
             worker.DoWork += worker_DoWork;
-            dvView = dvDataGridView;
+      //      worker.RunWorkerCompleted += bw_RunWorkerCompleted;
+       
 
             var iTimerInterval = Convert.ToInt32(syncInterval); //TODO:configurable
             objTimer.Interval = iTimerInterval;
@@ -40,12 +42,12 @@ namespace IntuitNotesApp.NoteDAl
         private static void worker_DoWork(object sender, DoWorkEventArgs e)
         {
 
-         Dictionary<string,Notes>  dictNotes= new NotesSync(new HttpClientUtil()).Sync(clientId);
-         var NotesList = new BindingList<Notes>(dictNotes.Values.ToList());
-         dvView.DataSource = NotesList;
-         dvView.Refresh();
+         Dictionary<string,Notes>  dictNotes= new NotesSync(new HttpClientUtil()).Sync(clientId).Result;
+
        
         }
+     
+
         
     }
 }

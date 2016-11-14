@@ -19,7 +19,7 @@ namespace IntuitNotesBL.NoteDAl
 
                 var Value = new StringContent(jsonContent, Encoding.UTF8, "application/json");
 
-                var httpResponseMessage = await _httpClient.PostAsync(url, Value);
+                var httpResponseMessage = await _httpClient.PostAsync(url, Value).ConfigureAwait(false);
                 var response = await httpResponseMessage.Content.ReadAsStringAsync();
                 returnValue.Content = response;
                 returnValue.Status = httpResponseMessage.StatusCode;
@@ -28,6 +28,7 @@ namespace IntuitNotesBL.NoteDAl
             {
                 returnValue.Status = HttpStatusCode.InternalServerError;
             }
+
             return returnValue;
         }
     }

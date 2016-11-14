@@ -9,6 +9,7 @@ namespace IntuitCloudService.SyncBL
 {
     public class SyncServer
     {
+        private static DbWrapper dbServer = new DbWrapper("|DataDirectory|servernotes.db");
         public static DateTime lastClinetSyncTimestamp;
         public static List<Notes> Sync(NoteStore noteStore)
         {
@@ -16,16 +17,18 @@ namespace IntuitCloudService.SyncBL
             var notesToSyncFromClient = noteStore.LstNotes;
             foreach (var note in notesToSyncFromClient)
             {
-                DbWrapper.UpsertNotes(note);
+                dbServer.UpsertNotes(note);
             }
-            return GetServerDatatoSend(noteToSyncFromServer, notesToSyncFromClient);
+            List<Notes> returnList= GetServerDatatoSend(noteToSyncFromServer, notesToSyncFromClient);
+            dbServer.UpdateSyncTimeStamp(noteStore);
+            return returnList;
         }
 
         private static List<Notes> GetDataFromServer(NoteStore noteStore)
         {
-            List<Notes> notesFromStore = DbWrapper.GetNotesForSync();
+            List<Notes> notesFromStore = dbServer.GetNotesForSync();
             List<Notes> noteToSync = new List<Notes>();
-            lastClinetSyncTimestamp = DbWrapper.GetLastSyncTimestamp(noteStore.ClientId);
+            lastClinetSyncTimestamp = dbServer.GetLastSyncTimestamp(noteStore.ClientId);
             var changedListFromServer = notesFromStore.Select(n => n).Where(f => f.ModifiedDate > lastClinetSyncTimestamp);
             if ((changedListFromServer != null) && (changedListFromServer.Count() > 0))
                 noteToSync = changedListFromServer.ToList();
@@ -39,6 +42,7 @@ namespace IntuitCloudService.SyncBL
                 var item = noteToSyncFromServer.SingleOrDefault(x => x.NoteGuid == notetoRemove.NoteGuid);
                 noteToSyncFromServer.Remove(item);
             }
+         
             return noteToSyncFromServer;
         }
     }

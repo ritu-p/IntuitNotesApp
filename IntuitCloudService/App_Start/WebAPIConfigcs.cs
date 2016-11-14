@@ -18,7 +18,7 @@ namespace IntuitCloudService
                 defaults: new { id = RouteParameter.Optional }
             );
 
-         DbWrapper.Connect("|DataDirectory|servernotes");
+        // DbWrapper.Connect("|DataDirectory|servernotes.db");
         }
     }
 }
