@@ -4,7 +4,7 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
 using System.Windows.Forms;
-
+using IntuitNotesApp.NoteDAl;
 using IntuitNotesBL.NoteDAl;
 using IntuitNotesBL.NotesModel;
 
@@ -62,7 +62,7 @@ namespace IntuitNotesApp
         {
           DbWrapper.Connect("notes.db");
 
-SyncScheduler.StartSyncTimer();
+               SyncScheduler.StartSyncTimer(dvNotes);
             dicNotes = DbWrapper.GetNotesForDisplay();
             UpdateGridView();
         }

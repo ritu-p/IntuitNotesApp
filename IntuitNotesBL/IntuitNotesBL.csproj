@@ -59,7 +59,6 @@
     <Compile Include="NoteDAl\IHttpClientUtil.cs" />
     <Compile Include="NoteDAl\NotesSync.cs" />
     <Compile Include="NotesModel\NoteStore.cs" />
-    <Compile Include="NoteDAl\SyncScheduler.cs" />
     <Compile Include="NotesModel\Notes.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
